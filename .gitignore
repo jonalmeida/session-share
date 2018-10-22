@@ -32,16 +32,6 @@ proguard/
 # Android Studio captures folder
 captures/
 
-# IntelliJ
-*.iml
-.idea/workspace.xml
-.idea/tasks.xml
-.idea/gradle.xml
-.idea/assetWizardSettings.xml
-.idea/dictionaries
-.idea/libraries
-.idea/caches
-
 # Keystore files
 # Uncomment the following line if you do not want to check your keystore files in.
 #*.jks
@@ -52,14 +42,32 @@ captures/
 # Google Services (e.g. APIs or Firebase)
 google-services.json
 
-# Freeline
-freeline.py
-freeline/
-freeline_project_description.json
+# Intellij
+*.iml
+.idea/
 
-# fastlane
-fastlane/report.xml
-fastlane/Preview.html
-fastlane/screenshots
-fastlane/test_output
-fastlane/readme.md
+# Keystore files
+*.jks
+
+# Local checkout of localization files
+l10n-repo/
+
+# Compiled python code
+*.pyc
+
+# OS X
+.DS_Store
+
+# Infer output
+infer-out/
+
+# Screenshots
+fastlane/
+Screengrabfile
+
+# Adjust token file
+.adjust_token
+
+# Sentry token file
+.sentry_token
+
