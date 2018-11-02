@@ -1,4 +1,4 @@
-package com.jonalmeida.sessionshare.send
+package com.jonalmeida.sessionshare.fxsend
 
 import okhttp3.Interceptor
 import okhttp3.Response

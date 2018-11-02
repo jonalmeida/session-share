@@ -2,22 +2,26 @@ package com.jonalmeida.sessionshare.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.LinearLayoutManager.VERTICAL
 import android.view.Menu
 import android.view.MenuItem
 import com.jonalmeida.sessionshare.nsd.ShareNsdManager
 import com.jonalmeida.sessionshare.R
+import com.jonalmeida.sessionshare.client.ClientObserver
+import com.jonalmeida.sessionshare.client.WebSocketClient
 import com.jonalmeida.sessionshare.ext.Log
 import com.jonalmeida.sessionshare.ext.components
-import com.jonalmeida.sessionshare.utils.SafeIntent
+import com.jonalmeida.sessionshare.server.ServerObserver
 
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
+import android.net.Uri
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
+
+    var urlToSend: String = "https://www.youtube.com/watch?v=i8ju_10NkGY"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,13 +29,23 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         handleIntent(intent)
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+        val adapter = DiscoveryListAdapter { selectedItem ->
+            // TODO: create socket with selectedItem and send urlToSend
+            Log.d("selectedItem: ${selectedItem.name}")
+            selectedItem.info?.let {
+                WebSocketClient(it.toUri()).apply {
+                    connect()
+                }.also { client -> client.register(this@MainActivity) }
+            }
         }
-        val adapter = DiscoveryListAdapter()
+
+        // Register WebSocket server observer
+        components.serverWebSocket.register(this)
+
+        // Register lifecycle observers
+        lifecycle.addObserver(components.serverWebSocket)
         lifecycle.addObserver(ShareNsdManager(components, adapter))
+
         discovery_recyclerview.adapter = adapter
         discovery_recyclerview.layoutManager = LinearLayoutManager(this, VERTICAL, false)
     }
@@ -47,23 +61,46 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings -> {
+                val intent = Intent(this, SettingsActivity::class.java)
+                startActivity(intent)
+                true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
-//
-//    override fun onNewIntent(unsafeIntent: Intent) {
-//        handleIntent(unsafeIntent)
-//    }
+
+    override fun onNewIntent(unsafeIntent: Intent) {
+        handleIntent(unsafeIntent)
+    }
 
     private fun handleIntent(unsafeIntent: Intent) {
-//        val intent = SafeIntent(unsafeIntent)
-        when (intent.action) {
+        //val intent = SafeIntent(unsafeIntent)
+        when (unsafeIntent.action) {
             Intent.ACTION_SEND -> {
+                // TODO: Fix this, it's wrong but it works.
                 unsafeIntent.clipData?.let { clip ->
                     Log.d("Received url: ${clip.getItemAt(0).text}")
+                    urlToSend = clip.getItemAt(0).text.toString()
                 }
             }
         }
+    }
+
+    override fun onMessageReceived(message: String) {
+        Log.d("WE GOT A MESSAGE!!! $message")
+
+        Intent(Intent.ACTION_VIEW, Uri.parse(message)).also {
+            startActivity(it)
+        }
+    }
+
+    override fun onClientConnected() {
+        Log.d("CLIENT CONNECTED!")
+    }
+
+    override fun onServerConnected(): String? {
+        Log.d("CONNECTED TO A SERVER!")
+        return urlToSend
     }
 }

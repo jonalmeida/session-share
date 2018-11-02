@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.jonalmeida.sessionshare.R
-import com.jonalmeida.sessionshare.nsd.ServiceCallback
+import com.jonalmeida.sessionshare.nsd.NsdCallback
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
-import java.net.InetAddress
+import java.net.URI
 
-class DiscoveryListAdapter : RecyclerView.Adapter<DiscoveryListAdapter.ItemViewHolder>(), ServiceCallback {
+class DiscoveryListAdapter(
+    private val listener: DiscoveryListener
+) : RecyclerView.Adapter<DiscoveryListAdapter.ItemViewHolder>(), NsdCallback {
     private var listStore = mutableListOf<DiscoveryItem>()
 
     private fun add(item: DiscoveryItem) {
@@ -39,56 +41,62 @@ class DiscoveryListAdapter : RecyclerView.Adapter<DiscoveryListAdapter.ItemViewH
         }
     }
 
-    fun addAll(newList: MutableList<DiscoveryItem>) {
-        val diff = DiffUtil.calculateDiff(DiscoveryDiffCallback(listStore, newList))
-        launch(UI) {
-            diff.dispatchUpdatesTo(this@DiscoveryListAdapter)
-            listStore = newList
-        }
-    }
+    fun addAll(newList: MutableList<DiscoveryItem>) = updateListStore(newList)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.discovery_item, parent,
-            false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.discovery_item, parent, false)
         return ItemViewHolder(view)
     }
 
-    override fun getItemCount(): Int {
-        return listStore.size
+    override fun getItemCount() = listStore.size
+
+    override fun onBindViewHolder(viewHolder: ItemViewHolder, position: Int) =
+        viewHolder.bind(listStore[position], listener)
+
+    override fun serviceFound(item: DiscoveryItem) = add(item)
+
+    override fun serviceLost(item: DiscoveryItem) = remove(item)
+
+    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private var name: TextView = itemView.findViewById(R.id.discovery_name)
+        private var address: TextView = itemView.findViewById(R.id.discovery_address)
+
+        fun bind(discoveryItem: DiscoveryItem, listener: DiscoveryListener) {
+            address.text = discoveryItem.uuid
+            name.text = discoveryItem.name
+            itemView.setOnClickListener { _ ->
+                listener(discoveryItem)
+            }
+        }
     }
 
-    override fun onBindViewHolder(viewHolder: ItemViewHolder, position: Int) {
-        viewHolder.address.text = listStore[position].uuid
-        viewHolder.name.text = listStore[position].name
-    }
+    data class InetInfo(val address: String, val port: Int)
 
-    override fun serviceFound(item: DiscoveryItem) {
-        add(item)
-    }
-
-    override fun serviceLost(item: DiscoveryItem) {
-        remove(item)
-    }
-
-    data class InetInfo(val address: InetAddress?, val port: Int)
     data class DiscoveryItem(val name: String, val uuid: String, val info: InetInfo?) {
         override fun equals(other: Any?): Boolean {
             (other as DiscoveryItem).let {
                 return other.uuid == uuid
             }
         }
+
+        override fun hashCode(): Int {
+            return super.hashCode()
+        }
     }
 
-    class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var name: TextView = itemView.findViewById(R.id.discovery_name)
-        var address: TextView = itemView.findViewById(R.id.discovery_address)
-    }
-
-    class DiscoveryDiffCallback(private val oldList: List<DiscoveryItem>,
-                                private val newList: List<DiscoveryItem>) : DiffUtil.Callback() {
+    class DiscoveryDiffCallback(
+        private val oldList: List<DiscoveryItem>,
+        private val newList: List<DiscoveryItem>
+    ) : DiffUtil.Callback() {
         override fun getOldListSize(): Int = oldList.size
         override fun getNewListSize(): Int = newList.size
-        override fun areItemsTheSame(oldPos: Int, newPos: Int) = oldList[oldPos].uuid == newList[newPos].uuid
+        override fun areItemsTheSame(oldPos: Int, newPos: Int) = true
         override fun areContentsTheSame(oldPos: Int, newPos: Int) = oldList[oldPos] == newList[newPos]
     }
+}
+
+typealias DiscoveryListener = (DiscoveryListAdapter.DiscoveryItem) -> Unit
+
+fun DiscoveryListAdapter.InetInfo.toUri() : URI {
+    return URI("ws://$address:$port")
 }

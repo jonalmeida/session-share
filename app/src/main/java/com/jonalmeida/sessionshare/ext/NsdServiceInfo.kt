@@ -11,7 +11,7 @@ fun NsdServiceInfo.toDiscoveryItem(): DiscoveryListAdapter.DiscoveryItem {
         displayName ?: serviceName.split("_").first(),
         serviceName.split("_").last(),
         info = DiscoveryListAdapter.InetInfo(
-            host,
+            host?.hostAddress ?: "",
             port
         )
     )

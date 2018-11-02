@@ -17,8 +17,8 @@ import com.jonalmeida.sessionshare.ui.DiscoveryListAdapter
  */
 class ShareNsdManager(
     val components: Components,
-    delegate: ServiceCallback
-) : LifecycleObserver, ServiceCallback by delegate {
+    delegate: NsdCallback
+) : LifecycleObserver, NsdCallback by delegate {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun start() {
@@ -35,12 +35,6 @@ class ShareNsdManager(
             stopServiceDiscovery(mDiscoveryListener)
         }
     }
-
-//    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-//    fun shutdown() {
-//        shutdownService()
-//        components.serverSocket.close()
-//    }
 
     private val mRegistrationListener = object : NsdManager.RegistrationListener {
         override fun onServiceRegistered(serviceInfo: NsdServiceInfo) {
@@ -101,8 +95,10 @@ class ShareNsdManager(
         override fun onServiceLost(service: NsdServiceInfo) {
             // When the network service is no longer available.
             // Internal bookkeeping code goes here.
-            Log.e("service lost: $service")
-            delegate.serviceLost(service.toDiscoveryItem())
+            service.let { _ ->
+                Log.e("service lost: $service")
+                delegate.serviceLost(service.toDiscoveryItem())
+            }
         }
 
         override fun onDiscoveryStopped(serviceType: String) {
@@ -138,7 +134,7 @@ class ShareNsdManager(
     }
 }
 
-interface ServiceCallback {
+interface NsdCallback {
     fun serviceFound(item: DiscoveryListAdapter.DiscoveryItem)
     fun serviceLost(item: DiscoveryListAdapter.DiscoveryItem)
 }

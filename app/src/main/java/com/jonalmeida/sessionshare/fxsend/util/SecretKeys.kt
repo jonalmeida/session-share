@@ -1,6 +1,5 @@
-package com.jonalmeida.sessionshare.send.util
+package com.jonalmeida.sessionshare.fxsend.util
 
-import org.whispersystems.libsignal.kdf.HKDF
 import java.security.SecureRandom
 import java.util.Arrays
 

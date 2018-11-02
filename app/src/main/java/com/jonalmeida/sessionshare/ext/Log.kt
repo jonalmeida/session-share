@@ -1,18 +1,17 @@
 package com.jonalmeida.sessionshare.ext
 
 import android.util.Log
-import java.lang.Exception
 
 object Log {
-    fun d(s: String, e: Exception? = null) {
+    fun d(s: String, e: Throwable? = null) {
         Log.d(LOGTAG, s, e)
     }
 
-    fun e(s: String, e: Exception? = null) {
+    fun e(s: String, e: Throwable? = null) {
         Log.e(LOGTAG, s, e)
     }
 
-    fun w(s: String, e: Exception? = null) {
+    fun w(s: String, e: Throwable? = null) {
         Log.w(LOGTAG, s, e)
     }
 

@@ -3,18 +3,27 @@ package com.jonalmeida.sessionshare
 import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
-import com.jonalmeida.sessionshare.send.AuthInterceptor
+import android.preference.PreferenceManager
+import com.jonalmeida.sessionshare.fxsend.AuthInterceptor
+import com.jonalmeida.sessionshare.server.WebSocketServer
 import okhttp3.OkHttpClient
 import java.net.ServerSocket
 import java.util.UUID
 
 open class Components(private val applicationContext: Context) {
 
-    val serverSocket by lazy {
+    private val serverSocket by lazy {
         ServerSocket(0)
     }
 
     private val localPort = serverSocket.localPort
+
+    val serverWebSocket by lazy {
+        serverSocket.close()
+        WebSocketServer(localPort).apply {
+            start()
+        }
+    }
 
     var nsdServiceName = "Session_" + UUID.randomUUID()
 
@@ -25,9 +34,7 @@ open class Components(private val applicationContext: Context) {
             serviceName = nsdServiceName
             serviceType = "_mozShare._tcp"
             port = localPort
-            //TODO: Add a setting UI that let's you enter your display name.
-//            setAttribute("dName", "Fenix Device on Nexus 5X")
-            setAttribute("dName", "Fenix Device on Pixel 2")
+            setAttribute("dName", displayName)
         }
     }
 
@@ -39,5 +46,9 @@ open class Components(private val applicationContext: Context) {
         OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor())
             .build()
+    }
+
+    val displayName by lazy {
+        PreferenceManager.getDefaultSharedPreferences(applicationContext).getString("display_name", "Unknown Fenix Device")
     }
 }
