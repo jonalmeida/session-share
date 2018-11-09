@@ -40,10 +40,11 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
         }
 
         // Register WebSocket server observer
-        components.serverWebSocket.register(this)
+        components.serverSocketManager.getOrCreateServer().register(this)
 
         // Register lifecycle observers
-        lifecycle.addObserver(components.serverWebSocket)
+        lifecycle.addObserver(components.serverSocketManager)
+//        lifecycle.addObserver(components.serverWebSocket)
         lifecycle.addObserver(ShareNsdManager(components, adapter))
 
         discovery_recyclerview.adapter = adapter

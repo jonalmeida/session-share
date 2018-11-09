@@ -64,7 +64,7 @@ class DiscoveryListAdapter(
         fun bind(discoveryItem: DiscoveryItem, listener: DiscoveryListener) {
             address.text = discoveryItem.uuid
             name.text = discoveryItem.name
-            itemView.setOnClickListener { _ ->
+            itemView.setOnClickListener {
                 listener(discoveryItem)
             }
         }

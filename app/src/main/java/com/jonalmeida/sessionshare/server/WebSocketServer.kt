@@ -1,8 +1,5 @@
 package com.jonalmeida.sessionshare.server
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleObserver
-import android.arch.lifecycle.OnLifecycleEvent
 import com.jonalmeida.sessionshare.ext.Log
 import mozilla.components.support.base.observer.Observable
 import mozilla.components.support.base.observer.ObserverRegistry
@@ -15,11 +12,10 @@ import java.net.InetSocketAddress
 class WebSocketServer(
     port: Int = WebSocket.DEFAULT_PORT,
     delegate: Observable<ServerObserver> = ObserverRegistry()
-) : WebSocketServer(InetSocketAddress(port)), LifecycleObserver, Observable<ServerObserver> by delegate {
+) : WebSocketServer(InetSocketAddress(port)), Observable<ServerObserver> by delegate {
 
     private var connection: WebSocket? = null
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
     fun shutdown() {
         Log.d("stopping WebSocketServer")
         connection?.let {
@@ -30,7 +26,6 @@ class WebSocketServer(
         stop()
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun teardown() {
         connection?.let {
             if (!it.isClosed) {
@@ -40,23 +35,17 @@ class WebSocketServer(
     }
 
     override fun onOpen(conn: WebSocket?, handshake: ClientHandshake?) {
-        notifyObservers {
-            onClientConnected()
-//                ?.let { data ->
-//                conn?.send(data)
-//            }
-        }
+        notifyObservers { onClientConnected() }
     }
 
     override fun onClose(conn: WebSocket?, code: Int, reason: String?, remote: Boolean) {
         Log.e("Closing server connection for reason (code): $code")
+        notifyObservers { onServerStopped() }
     }
 
     override fun onMessage(conn: WebSocket?, message: String?) {
         message?.let {
-            notifyObservers {
-                onMessageReceived(it)
-            }
+            notifyObservers { onMessageReceived(it) }
         }
     }
 
@@ -69,7 +58,7 @@ class WebSocketServer(
     }
 
     override fun onError(conn: WebSocket?, ex: Exception?) {
-        Log.e("We (server) goofed!", ex)
+        Log.e("We (server) goofed with ${conn?.remoteSocketAddress}!", ex)
     }
 
     companion object {
