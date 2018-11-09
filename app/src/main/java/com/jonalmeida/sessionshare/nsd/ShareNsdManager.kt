@@ -7,9 +7,9 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdManager.PROTOCOL_DNS_SD
 import android.net.nsd.NsdServiceInfo
 import com.jonalmeida.sessionshare.Components
+import com.jonalmeida.sessionshare.discovery.DiscoveryServiceProvider
 import com.jonalmeida.sessionshare.ext.Log
 import com.jonalmeida.sessionshare.ext.toDiscoveryItem
-import com.jonalmeida.sessionshare.ui.DiscoveryListAdapter
 
 /**
  * Takes care of (un)registering the network service as well as listening for service registration
@@ -17,8 +17,8 @@ import com.jonalmeida.sessionshare.ui.DiscoveryListAdapter
  */
 class ShareNsdManager(
     val components: Components,
-    delegate: NsdCallback
-) : LifecycleObserver, NsdCallback by delegate {
+    delegate: DiscoveryServiceProvider
+) : LifecycleObserver, DiscoveryServiceProvider by delegate {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
     fun start() {
@@ -95,7 +95,7 @@ class ShareNsdManager(
         override fun onServiceLost(service: NsdServiceInfo) {
             // When the network service is no longer available.
             // Internal bookkeeping code goes here.
-            service.let { _ ->
+            service.let {
                 Log.e("service lost: $service")
                 delegate.serviceLost(service.toDiscoveryItem())
             }
@@ -132,9 +132,4 @@ class ShareNsdManager(
     companion object {
         private const val SERVICE_TYPE = "_mozShare._tcp."
     }
-}
-
-interface NsdCallback {
-    fun serviceFound(item: DiscoveryListAdapter.DiscoveryItem)
-    fun serviceLost(item: DiscoveryListAdapter.DiscoveryItem)
 }

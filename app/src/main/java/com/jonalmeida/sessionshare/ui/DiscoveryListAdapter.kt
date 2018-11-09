@@ -7,14 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import com.jonalmeida.sessionshare.R
-import com.jonalmeida.sessionshare.nsd.NsdCallback
+import com.jonalmeida.sessionshare.discovery.DiscoveryServiceProvider
 import kotlinx.coroutines.experimental.android.UI
 import kotlinx.coroutines.experimental.launch
 import java.net.URI
 
 class DiscoveryListAdapter(
     private val listener: DiscoveryListener
-) : RecyclerView.Adapter<DiscoveryListAdapter.ItemViewHolder>(), NsdCallback {
+) : RecyclerView.Adapter<DiscoveryListAdapter.ItemViewHolder>(),
+    DiscoveryServiceProvider {
     private var listStore = mutableListOf<DiscoveryItem>()
 
     private fun add(item: DiscoveryItem) {
