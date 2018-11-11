@@ -25,7 +25,7 @@ class WebSocketClient(
             val data = onServerConnected()
             handshakedata?.let { handshake ->
                 Log.d("Checking handshake status: ${handshake.httpStatus}")
-                //if (handshake.httpStatus in 200..299 && bytes != null) { //No use for this yet.
+                //if (handshake.httpStatus in 100..299 && bytes != null) { //No use for this yet.
                 send(data)
                 //}
             }.also {

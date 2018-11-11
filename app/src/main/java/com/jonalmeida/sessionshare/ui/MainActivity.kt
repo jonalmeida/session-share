@@ -87,20 +87,20 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
         }
     }
 
+    override fun onClientConnected() {
+        Log.d("Server: CLIENT CONNECTED!")
+    }
+
     override fun onMessageReceived(message: String) {
-        Log.d("WE GOT A MESSAGE!!! $message")
+        Log.d("Server: WE GOT A MESSAGE!!! $message")
 
         Intent(Intent.ACTION_VIEW, Uri.parse(message)).also {
             startActivity(it)
         }
     }
 
-    override fun onClientConnected() {
-        Log.d("CLIENT CONNECTED!")
-    }
-
     override fun onServerConnected(): String? {
-        Log.d("CONNECTED TO A SERVER! Sending data: $urlToSend")
+        Log.d("Client: CONNECTED TO A SERVER! Sending data: $urlToSend")
         return urlToSend
     }
 }

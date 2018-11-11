@@ -11,11 +11,18 @@ import java.util.UUID
 
 open class Components(private val applicationContext: Context) {
 
+    val serviceUuid = UUID.randomUUID()!!
+
+    var nsdServiceName = "Session_$serviceUuid"
+
+    private val displayName by lazy {
+        PreferenceManager.getDefaultSharedPreferences(applicationContext)
+            .getString("display_name", "Unknown Fenix Device")
+    }
+
     val serverSocketManager by lazy {
         ServerSocketManager()
     }
-
-    var nsdServiceName = "Session_" + UUID.randomUUID()
 
     val nsdServiceInfo by lazy {
         NsdServiceInfo().apply {
@@ -36,9 +43,5 @@ open class Components(private val applicationContext: Context) {
         OkHttpClient.Builder()
             .addInterceptor(AuthInterceptor())
             .build()
-    }
-
-    val displayName by lazy {
-        PreferenceManager.getDefaultSharedPreferences(applicationContext).getString("display_name", "Unknown Fenix Device")
     }
 }
