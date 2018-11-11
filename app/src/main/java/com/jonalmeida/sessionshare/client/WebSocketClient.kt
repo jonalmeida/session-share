@@ -25,9 +25,9 @@ class WebSocketClient(
             val data = onServerConnected()
             handshakedata?.let { handshake ->
                 Log.d("Checking handshake status: ${handshake.httpStatus}")
-//                if (handshake.httpStatus in 200..299 && bytes != null) {
-                    send(data)
-//                }
+                //if (handshake.httpStatus in 200..299 && bytes != null) { //No use for this yet.
+                send(data)
+                //}
             }.also {
                 close(CLIENT_CLOSED_SUCCESS)
             }
@@ -38,13 +38,15 @@ class WebSocketClient(
         notifyObservers {
             close(code)
         }
-//        when (code) {
-//            WebSocketServer.SERVER_CONTEXT_DESTROYED ->
-//                Log.d("Server closed unexpectedly.")
-//            WebSocketServer.SERVER_CLOSE_SUCCESS ->
-//                Log.d("Server closed connection; data received.")
-//        }
-        Log.e("Closing server connection for reason (code): $code")
+        /* No use for this yet.
+        when (code) {
+            WebSocketServer.SERVER_CONTEXT_DESTROYED ->
+                Log.d("Server closed unexpectedly.")
+            WebSocketServer.SERVER_CLOSE_SUCCESS ->
+                Log.d("Server closed connection; data received.")
+        }
+        */
+        Log.e("Closing client connection for reason (code): $code, closed by server: $remote")
     }
 
     override fun onMessage(message: String?) {

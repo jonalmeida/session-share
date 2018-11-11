@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
             selectedItem.info?.let {
                 WebSocketClient(it.toUri()).apply {
                     connect()
-                }.also { client -> client.register(this@MainActivity) }
+                }.also { client -> client.register(this@MainActivity, this@MainActivity) }
             }
         }
 
@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
 
         // Register lifecycle observers
         lifecycle.addObserver(components.serverSocketManager)
-//        lifecycle.addObserver(components.serverWebSocket)
         lifecycle.addObserver(ShareNsdManager(components, adapter))
 
         discovery_recyclerview.adapter = adapter
@@ -101,7 +100,7 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
     }
 
     override fun onServerConnected(): String? {
-        Log.d("CONNECTED TO A SERVER!")
+        Log.d("CONNECTED TO A SERVER! Sending data: $urlToSend")
         return urlToSend
     }
 }

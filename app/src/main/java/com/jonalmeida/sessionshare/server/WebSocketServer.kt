@@ -16,7 +16,7 @@ class WebSocketServer(
 
     private var connection: WebSocket? = null
 
-    fun shutdown() {
+    fun teardown() {
         Log.d("stopping WebSocketServer")
         connection?.let {
             if (!it.isClosed) {
@@ -26,7 +26,7 @@ class WebSocketServer(
         stop()
     }
 
-    fun teardown() {
+    fun shutdown() {
         connection?.let {
             if (!it.isClosed) {
                 it.closeConnection(SERVER_CONTEXT_DESTROYED, "Sugar, we're going down")
