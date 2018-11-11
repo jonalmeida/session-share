@@ -7,19 +7,19 @@ import com.jonalmeida.sessionshare.ext.Log
 import org.java_websocket.WebSocket.DEFAULT_PORT
 import java.net.ServerSocket
 
-class ServerSocketManager : LifecycleObserver, ServerObserver {
+class WebSocketServerManager : LifecycleObserver, ServerObserver {
     private var serverSocket: ServerSocket
     private var backingSocketServer: WebSocketServer
     var localPort: Int = DEFAULT_PORT
 
     init {
-        Log.d("Starting ServerSocketManager")
+        Log.d("Starting WebSocketServerManager")
         serverSocket = ServerSocket(0).also { socket ->
             localPort = socket.localPort
             socket.close()
         }
         backingSocketServer = WebSocketServer(localPort).apply {
-            register(this@ServerSocketManager)
+            register(this@WebSocketServerManager)
             start()
         }
     }
@@ -46,7 +46,7 @@ class ServerSocketManager : LifecycleObserver, ServerObserver {
         synchronized(backingSocketServer) {
             Log.d("Server: starting new ServerSocket")
             backingSocketServer = WebSocketServer(localPort).apply {
-                register(this@ServerSocketManager)
+                register(this@WebSocketServerManager)
                 start()
             }
         }

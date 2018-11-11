@@ -5,7 +5,7 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.preference.PreferenceManager
 import com.jonalmeida.sessionshare.fxsend.AuthInterceptor
-import com.jonalmeida.sessionshare.server.ServerSocketManager
+import com.jonalmeida.sessionshare.server.WebSocketServerManager
 import okhttp3.OkHttpClient
 import java.util.UUID
 
@@ -21,7 +21,7 @@ open class Components(private val applicationContext: Context) {
     }
 
     val serverSocketManager by lazy {
-        ServerSocketManager()
+        WebSocketServerManager()
     }
 
     val nsdServiceInfo by lazy {

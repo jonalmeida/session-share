@@ -7,7 +7,8 @@ import android.net.nsd.NsdManager
 import android.net.nsd.NsdManager.PROTOCOL_DNS_SD
 import android.net.nsd.NsdServiceInfo
 import com.jonalmeida.sessionshare.Components
-import com.jonalmeida.sessionshare.discovery.DiscoveryServiceProvider
+import com.jonalmeida.sessionshare.discovery.DiscoveryService
+import com.jonalmeida.sessionshare.discovery.DiscoveryServiceReceiver
 import com.jonalmeida.sessionshare.ext.Log
 import com.jonalmeida.sessionshare.ext.toDiscoveryItem
 
@@ -17,11 +18,11 @@ import com.jonalmeida.sessionshare.ext.toDiscoveryItem
  */
 class ShareNsdManager(
     val components: Components,
-    delegate: DiscoveryServiceProvider
-) : LifecycleObserver, DiscoveryServiceProvider by delegate {
+    delegate: DiscoveryServiceReceiver
+) : LifecycleObserver, DiscoveryService, DiscoveryServiceReceiver by delegate {
 
     @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun start() {
+    override fun startService() {
         components.nsdManager.apply {
             registerService(components.nsdServiceInfo, PROTOCOL_DNS_SD, mRegistrationListener)
             discoverServices(SERVICE_TYPE, PROTOCOL_DNS_SD, mDiscoveryListener)
@@ -29,7 +30,7 @@ class ShareNsdManager(
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-    fun shutdownService() {
+    override fun stopService() {
         components.nsdManager.apply {
             unregisterService(mRegistrationListener)
             stopServiceDiscovery(mDiscoveryListener)
@@ -97,7 +98,7 @@ class ShareNsdManager(
             // Internal bookkeeping code goes here.
             service.let {
                 Log.e("service lost: $service")
-                delegate.serviceLost(service.toDiscoveryItem())
+                serviceLost(service.toDiscoveryItem())
             }
         }
 
@@ -125,7 +126,7 @@ class ShareNsdManager(
 
         override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
             Log.d("Resolve Succeeded. $serviceInfo")
-            delegate.serviceFound(serviceInfo.toDiscoveryItem())
+            serviceFound(serviceInfo.toDiscoveryItem())
         }
     }
 

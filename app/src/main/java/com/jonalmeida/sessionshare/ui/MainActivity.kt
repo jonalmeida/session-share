@@ -18,6 +18,7 @@ import com.jonalmeida.sessionshare.server.ServerObserver
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import android.net.Uri
+import com.jonalmeida.sessionshare.discovery.toUri
 
 class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
 
