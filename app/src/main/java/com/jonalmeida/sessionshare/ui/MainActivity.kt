@@ -18,10 +18,12 @@ import com.jonalmeida.sessionshare.server.ServerObserver
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import android.net.Uri
+import kotlinx.android.synthetic.main.upload_item.*
 
 class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
 
-    var urlToSend: String = "https://www.youtube.com/watch?v=i8ju_10NkGY"
+    // For demo-ing
+    private var urlToSend: String = "https://www.youtube.com/watch?v=i8ju_10NkGY"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,20 +48,18 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
         lifecycle.addObserver(components.serverSocketManager)
         lifecycle.addObserver(ShareNsdManager(components, adapter))
 
+        discovery_recyclerview.setEmptyView(upload_item)
         discovery_recyclerview.adapter = adapter
         discovery_recyclerview.layoutManager = LinearLayoutManager(this, VERTICAL, false)
+        discovery_recyclerview.setHasFixedSize(true)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> {
                 val intent = Intent(this, SettingsActivity::class.java)

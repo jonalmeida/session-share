@@ -50,8 +50,8 @@ class DiscoveryListAdapter(
     private fun updateListStore(newList: MutableList<DiscoveryItem>) {
         val diff = DiffUtil.calculateDiff(DiscoveryDiffCallback(listStore, newList))
         CoroutineScope(Dispatchers.Main).launch {
-            diff.dispatchUpdatesTo(this@DiscoveryListAdapter)
             listStore = newList
+            diff.dispatchUpdatesTo(this@DiscoveryListAdapter)
         }
     }
 

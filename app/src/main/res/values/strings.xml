@@ -12,8 +12,13 @@
 
     <string name="pref_title_display_name">Display name</string>
     <string name="pref_default_display_name">Unknown Fenix Device</string>
+
+    <!-- General strings -->
     <string name="send">Send</string>
     <string name="firefox_test_pilot">Firefox Test Pilot</string>
     <string name="web_experiment">web experiment</string>
-    <string name="share_qr_code">Share via QR code</string>
+    <string name="share_qr_code">Scan other device</string>
+    <string name="no_find_your_device">Can\'t find your device?</string>
+    <string name="no_find_your_device_subtitle">Share a QR code instead!</string>
+    <string name="show_code">Show QR code</string>
 </resources>
