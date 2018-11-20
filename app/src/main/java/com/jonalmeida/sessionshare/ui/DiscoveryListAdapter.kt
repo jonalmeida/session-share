@@ -9,8 +9,9 @@ import android.widget.TextView
 import com.jonalmeida.sessionshare.R
 import com.jonalmeida.sessionshare.discovery.DiscoveryItem
 import com.jonalmeida.sessionshare.discovery.DiscoveryServiceReceiver
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 typealias DiscoveryListener = (DiscoveryItem) -> Unit
 
@@ -48,7 +49,7 @@ class DiscoveryListAdapter(
 
     private fun updateListStore(newList: MutableList<DiscoveryItem>) {
         val diff = DiffUtil.calculateDiff(DiscoveryDiffCallback(listStore, newList))
-        launch(UI) {
+        CoroutineScope(Dispatchers.Main).launch {
             diff.dispatchUpdatesTo(this@DiscoveryListAdapter)
             listStore = newList
         }
