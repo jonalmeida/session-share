@@ -84,7 +84,17 @@ class ShareNsdManager(
                     // Service type is the string containing the protocol and
                     // transport layer for this service.
                     Log.d("Found our service: ${service.serviceName}")
-                    components.nsdManager.resolveService(service, mResolveListener)
+                    components.nsdManager.resolveService(service, object: NsdManager.ResolveListener {
+                        override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
+                            // Called when the resolve fails. Use the error code to debug.
+                            Log.e("Resolve failed: $errorCode")
+                        }
+
+                        override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
+                            Log.d("Resolve Succeeded. $serviceInfo")
+                            serviceFound(serviceInfo.toDiscoveryItem())
+                        }
+                    })
                 }
                 else -> {
                     // transport layer for this service.
@@ -114,19 +124,6 @@ class ShareNsdManager(
         override fun onStopDiscoveryFailed(serviceType: String, errorCode: Int) {
             Log.e("Discovery failed: Error code:$errorCode")
             components.nsdManager.stopServiceDiscovery(this)
-        }
-    }
-
-    private val mResolveListener = object : NsdManager.ResolveListener {
-
-        override fun onResolveFailed(serviceInfo: NsdServiceInfo, errorCode: Int) {
-            // Called when the resolve fails. Use the error code to debug.
-            Log.e("Resolve failed: $errorCode")
-        }
-
-        override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
-            Log.d("Resolve Succeeded. $serviceInfo")
-            serviceFound(serviceInfo.toDiscoveryItem())
         }
     }
 
