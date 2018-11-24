@@ -31,22 +31,31 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
         setSupportActionBar(toolbar)
 
         handleIntent(intent)
-        val adapter = DiscoveryListAdapter { selectedItem ->
-            // TODO: create socket with selectedItem and send urlToSend
+        val listAdapter = DiscoveryListAdapter { selectedItem ->
             Log.d("selectedItem: ${selectedItem.name}")
             selectedItem.info?.let {
                 WebSocketClient(it.toUri()).apply {
                     connect()
                 }.also { client -> client.register(this@MainActivity, this@MainActivity) }
             }
+
         }
 
         // Register WebSocket server observer
         components.serverSocketManager.getOrCreateServer().register(this)
 
         // Register lifecycle observers
-        lifecycle.addObserver(components.serverSocketManager)
-        lifecycle.addObserver(ShareNsdManager(components, adapter))
+        lifecycle.apply {
+            addObserver(components.serverSocketManager)
+            addObserver(ShareNsdManager(components, listAdapter))
+        }
+
+        recyclerview.apply {
+            setEmptyView(uploadItem)
+            adapter = listAdapter
+            layoutManager = LinearLayoutManager(this@MainActivity, VERTICAL, false)
+            setHasFixedSize(true)
+        }
 
         discovery_recyclerview.setEmptyView(upload_item)
         discovery_recyclerview.adapter = adapter
