@@ -18,6 +18,8 @@ import com.jonalmeida.sessionshare.server.ServerObserver
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.content_main.*
 import android.net.Uri
+import com.google.zxing.integration.android.IntentIntegrator
+import com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES
 import kotlinx.android.synthetic.main.upload_item.*
 
 class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
@@ -51,16 +53,18 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
         }
 
         recyclerview.apply {
-            setEmptyView(uploadItem)
+            setEmptyView(uploadItemLayout)
             adapter = listAdapter
             layoutManager = LinearLayoutManager(this@MainActivity, VERTICAL, false)
             setHasFixedSize(true)
         }
 
-        discovery_recyclerview.setEmptyView(upload_item)
-        discovery_recyclerview.adapter = adapter
-        discovery_recyclerview.layoutManager = LinearLayoutManager(this, VERTICAL, false)
-        discovery_recyclerview.setHasFixedSize(true)
+        uploadButton.setOnClickListener {
+            IntentIntegrator(this).let { intent ->
+                Log.d("zxing click")
+                intent.initiateScan(QR_CODE_TYPES)
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -111,5 +115,16 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
     override fun onServerConnected(): String? {
         Log.d("Client: CONNECTED TO A SERVER! Sending data: $urlToSend")
         return urlToSend
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        val scanResult = IntentIntegrator.parseActivityResult(IntentIntegrator.REQUEST_CODE, resultCode, data)
+        scanResult?.contents?.let {
+            Log.d("scanned code: $it")
+            Intent(Intent.ACTION_VIEW, Uri.parse(it)).also { intent ->
+                startActivity(intent)
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 }
