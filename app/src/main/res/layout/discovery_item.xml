@@ -2,9 +2,9 @@
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="?selectableItemBackground"
     android:layout_width="match_parent"
-    android:layout_height="64dp">
+    android:layout_height="64dp"
+    android:background="?selectableItemBackground">
 
     <TextView
         android:id="@+id/discovery_address"
@@ -33,15 +33,16 @@
         app:layout_constraintTop_toBottomOf="@+id/discovery_address"
         tools:text="Macbook Pro 2017" />
 
-    <com.jonalmeida.sessionshare.ui.BearerTypeLayout
+    <com.jonalmeida.sessionshare.ui.BearerLayout
         android:id="@+id/bearers_available"
-        android:layout_width="75dp"
+        android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
+        android:gravity="center_vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
 </android.support.constraint.ConstraintLayout>
