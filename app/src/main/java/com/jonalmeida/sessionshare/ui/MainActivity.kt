@@ -59,10 +59,16 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
             setHasFixedSize(true)
         }
 
-        uploadButton.setOnClickListener {
+        button.setOnClickListener {
             IntentIntegrator(this).let { intent ->
                 Log.d("zxing click")
                 intent.initiateScan(QR_CODE_TYPES)
+            }
+        }
+
+        uploadButton.setOnClickListener {
+            Intent(this, QrCodeActivity::class.java).apply {
+                startActivity(this@apply)
             }
         }
     }
