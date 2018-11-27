@@ -60,6 +60,7 @@ class DiscoveryListAdapter(
     class ItemViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private var name: TextView = itemView.findViewById(R.id.discovery_name)
         private var address: TextView = itemView.findViewById(R.id.discovery_address)
+        private var bearerLayout: BearerLayout = itemView.findViewById(R.id.bearers_available)
 
         fun bind(item: DiscoveryItem, listener: DiscoveryListener) {
             address.text = item.uuid
@@ -67,6 +68,7 @@ class DiscoveryListAdapter(
             itemView.setOnClickListener {
                 listener(item)
             }
+            bearerLayout.setBearers(listOf(BearerLayout.Bearer.WIFI))
         }
     }
 
