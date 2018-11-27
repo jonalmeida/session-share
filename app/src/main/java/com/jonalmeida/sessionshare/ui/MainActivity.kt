@@ -21,6 +21,7 @@ import android.net.Uri
 import com.google.zxing.integration.android.IntentIntegrator
 import com.google.zxing.integration.android.IntentIntegrator.QR_CODE_TYPES
 import kotlinx.android.synthetic.main.upload_item.*
+import android.util.Patterns
 
 class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
 
@@ -113,8 +114,12 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
     override fun onMessageReceived(message: String) {
         Log.d("Server: WE GOT A MESSAGE!!! $message")
 
-        Intent(Intent.ACTION_VIEW, Uri.parse(message)).also {
-            startActivity(it)
+        val links = message.extractLinks()
+        if (links.isNotEmpty()) {
+            Log.d("Found a link: $links[0]")
+            Intent(Intent.ACTION_VIEW, Uri.parse(links[0])).also {
+                startActivity(it)
+            }
         }
     }
 
@@ -132,5 +137,15 @@ class MainActivity : AppCompatActivity(), ServerObserver, ClientObserver {
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun String.extractLinks(): List<String> {
+        val links: MutableList<String> = mutableListOf()
+        val m = Patterns.WEB_URL.matcher(this)
+        while (m.find()) {
+            val url = m.group()
+            links.add(url)
+        }
+        return links
     }
 }
